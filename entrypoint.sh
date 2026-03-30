@@ -6,8 +6,9 @@ echo ${GITHUB_REF#refs/*/}
 
 REF=${GITHUB_REF#refs/heads/}
 COMMIT_ID=${GITHUB_SHA::7}
+SEMVER_REGEX='^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$'
 
-if [[ "$REF" == "develop" || "$REF" == "develop-spring-2" ]]; then
+if [[ "$REF" == "develop" || ( "$REF" != *"-rc_"* && "$REF" != *"-rc"* && ! ${GITHUB_REF#refs/*/} =~ $SEMVER_REGEX ) ]]; then
     printf "Branch name: $REF \nCommit ID: $COMMIT_ID"
     echo "RELEASE_VERSION=$COMMIT_ID" >> $GITHUB_ENV
     echo "GITOPS_BRANCH=develop" >> $GITHUB_ENV
@@ -22,7 +23,7 @@ elif [[ "$REF" == *"-rc"* ]]; then
     echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
     echo "GITOPS_BRANCH=homolog" >> $GITHUB_ENV
 
-elif [[ ${GITHUB_REF#refs/*/} =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$ ]]; then
+elif [[ ${GITHUB_REF#refs/*/} =~ $SEMVER_REGEX ]]; then
     printf "New tag: ${GITHUB_REF#refs/*/}"
     echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
     echo "GITOPS_BRANCH=release" >> $GITHUB_ENV
