@@ -38,5 +38,5 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
       - name: Notify on Sonar failure (non-blocking PR)
-        if: failure() && steps.sonar.outcome == 'failure'
+        if: steps.sonar.outcome == 'failure'
         run: echo "::warning::SonarQube scan failed (non-blocking on PR). See job logs for details."
